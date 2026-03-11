@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|English</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#198754;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.container{
+padding:15px;
+}
+
+input,button{
+padding:8px;
+margin:5px;
+}
+
+button{
+background:#198754;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.card{
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:6px;
+}
+
+.letters button{
+background:#198754;
+margin:2px;
+}
+
+.admin{
+background:#fff3cd;
+padding:10px;
+border-radius:6px;
+margin-top:10px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>English Hausa Dictionary</h2>
+</header>
+
+<div class="container">
+
+<input type="text" id="searchBox" placeholder="Search word...">
+<button onclick="searchWord()">Search</button>
+
+<div id="result"></div>
+
+<!-- A-Z -->
+<div class="letters" id="lettersDiv"></div>
+
+<div id="wordList"></div>
+
+<!-- ADMIN PANEL -->
+<div class="admin">
+
+<h3>Admin Panel</h3>
+
+<input type="password" id="adminPass" placeholder="Password"><br>
+
+<input type="text" id="eng" placeholder="English word">
+<input type="text" id="hau" placeholder="Hausa meaning">
+
+<button onclick="addWord()">Add Word</button>
+
+</div>
+
+</div>
+
+<script>
+
+// ELEMENTS
+const searchBox=document.getElementById("searchBox");
+const result=document.getElementById("result");
+const lettersDiv=document.getElementById("lettersDiv");
+const wordList=document.getElementById("wordList");
+
+// DEFAULT PASSWORD
+if(!localStorage.getItem("dictPassword")){
+localStorage.setItem("dictPassword","12345");
+}
+
+// LOAD DICTIONARY
+let dictionary=JSON.parse(localStorage.getItem("dictionary")) || {
+
+apple:"tuffa",
+ant:"tururuwa",
+book:"littafi",
+boy:"yaro",
+cat:"mage",
+car:"mota",
+dog:"kare",
+door:"kofa",
+egg:"kwai",
+fish:"kifi",
+goat:"akuya",
+house:"gida",
+king:"sarki",
+school:"makaranta",
+teacher:"malami",
+student:"dalibi",
+water:"ruwa",
+woman:"mace",
+man:"namiji"
+
+};
+
+// CREATE LETTERS
+let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+letters.split("").forEach(l=>{
+let btn=document.createElement("button");
+btn.innerText=l;
+btn.onclick=function(){showLetter(l)};
+lettersDiv.appendChild(btn);
+});
+
+// SEARCH
+function searchWord(){
+
+let w=searchBox.value.toLowerCase();
+
+if(dictionary[w]){
+
+result.innerHTML=
+`<div class="card"><b>${w}</b> = ${dictionary[w]}</div>`;
+
+}else{
+
+result.innerHTML=
+`<div class="card">Not found</div>`;
+
+}
+
+}
+
+// SHOW LETTER
+function showLetter(letter){
+
+let html="";
+
+for(let w in dictionary){
+
+if(w.toUpperCase().startsWith(letter)){
+
+html+=`<div class="card">${w} = ${dictionary[w]}</div>`;
+
+}
+
+}
+
+wordList.innerHTML=html;
+
+}
+
+// ADD WORD
+function addWord(){
+
+let pass=document.getElementById("adminPass").value;
+let realPass=localStorage.getItem("dictPassword");
+
+if(pass!==realPass){
+alert("Wrong password");
+return;
+}
+
+let e=document.getElementById("eng").value.toLowerCase();
+let h=document.getElementById("hau").value;
+
+if(!e||!h)return;
+
+dictionary[e]=h;
+
+localStorage.setItem("dictionary",JSON.stringify(dictionary));
+
+alert("Word added");
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|School</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#198754;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.container{
+padding:15px;
+}
+
+input,select,button{
+padding:8px;
+margin:5px;
+}
+
+button{
+background:#198754;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.card{
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:6px;
+}
+
+.total{
+background:#198754;
+color:white;
+padding:10px;
+border-radius:6px;
+margin-top:10px;
+}
+
+.hidden{
+display:none;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>School Management System</h2>
+</header>
+
+<div class="container">
+
+<!-- LOGIN / REGISTER -->
+<div id="auth">
+
+<h3>Register</h3>
+<input type="text" id="regUser" placeholder="Username">
+<input type="password" id="regPass" placeholder="Password">
+<button onclick="register()">Register</button>
+
+<h3>Login</h3>
+<input type="text" id="logUser" placeholder="Username">
+<input type="password" id="logPass" placeholder="Password">
+<button onclick="login()">Login</button>
+
+</div>
+
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+<h3>Create Class</h3>
+
+<input type="text" id="className" placeholder="Class name">
+<button onclick="createClass()">Create</button>
+
+<div id="classList"></div>
+
+
+<h3>Add Student</h3>
+
+<input type="text" id="studentName" placeholder="Student name">
+
+<select id="studentClass"></select>
+
+<input type="date" id="studentDate">
+
+<input type="text" id="studentTerm" placeholder="Term">
+
+<input type="number" id="studentAge" placeholder="Age">
+
+<input type="number" id="studentAmount" placeholder="Amount">
+
+<button onclick="addStudent()">Add</button>
+
+
+<h3>Search Student</h3>
+
+<input type="text" id="search" placeholder="Search..." onkeyup="searchStudent()">
+
+<div id="studentList"></div>
+
+<div class="total">
+Total Amount: ₦<span id="totalAmount">0</span>
+</div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+</div>
+
+<script>
+
+// STORAGE
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+let classes = JSON.parse(localStorage.getItem("classes") || "[]");
+let students = JSON.parse(localStorage.getItem("students") || "[]");
+
+if(!Array.isArray(students)){
+students=[];
+localStorage.setItem("students",JSON.stringify(students));
+}
+
+let currentUser=null;
+
+
+// REGISTER
+function register(){
+
+let u=document.getElementById("regUser").value;
+let p=document.getElementById("regPass").value;
+
+if(!u||!p){
+alert("Fill all fields");
+return;
+}
+
+users.push({user:u,pass:p});
+
+localStorage.setItem("users",JSON.stringify(users));
+
+alert("Registered Successfully");
+
+}
+
+
+// LOGIN
+function login(){
+
+let u=document.getElementById("logUser").value;
+let p=document.getElementById("logPass").value;
+
+let found=users.find(x=>x.user==u && x.pass==p);
+
+if(found){
+
+currentUser=u;
+
+document.getElementById("auth").style.display="none";
+
+document.getElementById("dashboard").classList.remove("hidden");
+
+loadClasses();
+
+loadStudents();
+
+}else{
+
+alert("Wrong login");
+
+}
+
+}
+
+
+// LOGOUT
+function logout(){
+
+location.reload();
+
+}
+
+
+// CREATE CLASS
+function createClass(){
+
+let c=document.getElementById("className").value;
+
+if(!c)return;
+
+classes.push(c);
+
+localStorage.setItem("classes",JSON.stringify(classes));
+
+loadClasses();
+
+document.getElementById("className").value="";
+
+}
+
+
+// LOAD CLASSES
+function loadClasses(){
+
+let studentClass=document.getElementById("studentClass");
+let classList=document.getElementById("classList");
+
+studentClass.innerHTML="";
+classList.innerHTML="";
+
+classes.forEach(c=>{
+
+studentClass.innerHTML+=`<option>${c}</option>`;
+
+classList.innerHTML+=`<div class="card">${c}</div>`;
+
+});
+
+}
+
+
+// ADD STUDENT
+function addStudent(){
+
+let s={
+
+id:Date.now(),
+
+name:studentName.value,
+
+class:studentClass.value,
+
+date:studentDate.value,
+
+term:studentTerm.value,
+
+age:studentAge.value,
+
+amount:Number(studentAmount.value)
+
+};
+
+students.push(s);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+studentName.value="";
+studentAge.value="";
+studentAmount.value="";
+studentTerm.value="";
+
+}
+
+
+// LOAD STUDENTS
+function loadStudents(){
+
+let html="";
+let total=0;
+
+students.forEach(s=>{
+
+total+=Number(s.amount);
+
+html+=`
+<div class="card">
+
+<b>${s.name}</b><br>
+
+Class: ${s.class}<br>
+
+Date: ${s.date}<br>
+
+Term: ${s.term}<br>
+
+Age: ${s.age}<br>
+
+Amount: ₦${s.amount}<br>
+
+<button onclick="editStudent(${s.id})">Edit</button>
+
+<button onclick="deleteStudent(${s.id})">Delete</button>
+
+</div>
+`;
+
+});
+
+document.getElementById("studentList").innerHTML=html;
+
+document.getElementById("totalAmount").innerText=total;
+
+}
+
+
+// SEARCH
+function searchStudent(){
+
+let q=document.getElementById("search").value.toLowerCase();
+
+let html="";
+
+students.forEach(s=>{
+
+if(
+
+s.name.toLowerCase().includes(q) ||
+
+s.class.toLowerCase().includes(q)
+
+){
+
+html+=`
+<div class="card">
+
+<b>${s.name}</b><br>
+
+Class: ${s.class}<br>
+
+Amount: ₦${s.amount}
+
+</div>
+`;
+
+}
+
+});
+
+document.getElementById("studentList").innerHTML=html;
+
+}
+
+
+// DELETE
+function deleteStudent(id){
+
+students=students.filter(s=>s.id!=id);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+}
+
+
+// EDIT
+function editStudent(id){
+
+let s=students.find(x=>x.id==id);
+
+let name=prompt("Name",s.name);
+
+let amount=prompt("Amount",s.amount);
+
+s.name=name;
+
+s.amount=Number(amount);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+}
+</script>
+
+</body>
+</html>

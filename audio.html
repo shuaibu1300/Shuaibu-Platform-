@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|Audio</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#1aad00;
+text-align:center;
+padding:20px;
+}
+
+.box{
+background: #f2f2f2f2;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+max-width:400px;
+margin:auto;
+}
+
+input,button{
+padding:10px;
+margin:5px;
+width:90%;
+}
+
+.audio-list{
+margin-top:20px;
+}
+
+audio{
+width:100%;
+margin-top:5px;
+}
+
+.folder{
+background: #198754;
+padding:10px;
+margin-top:10px;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Audio Upload</h2>
+
+<input type="password" id="password" placeholder="Admin Password">
+
+<button onclick="login()">Login</button>
+
+<div id="adminPanel" style="display:none">
+
+<input type="text" id="folderName" placeholder="Create Folder">
+
+<button onclick="createFolder()">Create Folder</button>
+
+<input type="file" id="audioFile" accept="audio/*">
+
+<select id="folderSelect"></select>
+
+<button onclick="uploadAudio()">Upload Audio</button>
+
+</div>
+
+<div class="audio-list" id="audioList"></div>
+
+</div>
+
+<script>
+
+let adminPassword = "1234";
+
+function login(){
+
+let pass = document.getElementById("password").value;
+
+if(pass === adminPassword){
+document.getElementById("adminPanel").style.display="block";
+alert("Admin Login Success");
+}else{
+alert("Wrong Password");
+}
+
+}
+
+function createFolder(){
+
+let name = document.getElementById("folderName").value;
+
+if(!name) return;
+
+let folders = JSON.parse(localStorage.getItem("folders")) || {};
+
+if(!folders[name]) folders[name] = [];
+
+localStorage.setItem("folders",JSON.stringify(folders));
+
+loadFolders();
+showAudios();
+
+}
+
+function loadFolders(){
+
+let select = document.getElementById("folderSelect");
+
+select.innerHTML="";
+
+let folders = JSON.parse(localStorage.getItem("folders")) || {};
+
+for(let f in folders){
+
+let option = document.createElement("option");
+
+option.value=f;
+option.textContent=f;
+
+select.appendChild(option);
+
+}
+
+}
+
+function uploadAudio(){
+
+let file = document.getElementById("audioFile").files[0];
+
+let folder = document.getElementById("folderSelect").value;
+
+if(!file || !folder) return;
+
+let reader = new FileReader();
+
+reader.onload = function(){
+
+let folders = JSON.parse(localStorage.getItem("folders"));
+
+folders[folder].push(reader.result);
+
+localStorage.setItem("folders",JSON.stringify(folders));
+
+showAudios();
+
+}
+
+reader.readAsDataURL(file);
+
+}
+
+function showAudios(){
+
+let container = document.getElementById("audioList");
+
+container.innerHTML="";
+
+let folders = JSON.parse(localStorage.getItem("folders")) || {};
+
+for(let folder in folders){
+
+let div = document.createElement("div");
+
+div.className="folder";
+
+div.innerHTML="<h3>"+folder+"</h3>";
+
+folders[folder].forEach(audio=>{
+
+let player=document.createElement("audio");
+
+player.controls=true;
+
+player.src=audio;
+
+div.appendChild(player);
+
+});
+
+container.appendChild(div);
+
+}
+
+}
+
+loadFolders();
+showAudios();
+
+</script>
+
+</body>
+</html>

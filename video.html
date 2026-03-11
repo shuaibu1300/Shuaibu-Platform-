@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|Video</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#198754;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+nav{
+background:#222;
+padding:10px;
+text-align:center;
+}
+
+nav button{
+padding:10px 20px;
+margin:5px;
+border:none;
+background:#198754;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+section{
+display:none;
+padding:15px;
+}
+
+.card{
+background:white;
+padding:10px;
+margin:10px 0;
+border-radius:6px;
+}
+
+input{
+padding:8px;
+margin:5px;
+width:90%;
+}
+
+button{
+padding:8px 15px;
+margin:5px;
+border:none;
+background:#198754;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+.deleteBtn{
+background:red;
+}
+
+.admin{
+background:#fff3cd;
+padding:10px;
+border-radius:6px;
+margin-bottom:10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<header>
+<h3>VIDEO / PDF PLATFORM</h3>
+</header>
+
+<nav>
+
+<button onclick="openPage('video')">Video</button>
+<button onclick="openPage('pdf')">PDF</button>
+<button onclick="openPage('live')">Live Video</button>
+
+</nav>
+
+<!-- VIDEO -->
+<section id="video">
+
+<h3>Video Section</h3>
+
+<div class="admin">
+
+<input type="password" id="videoPass" placeholder="Admin password">
+
+<input type="file" id="videoFile" multiple>
+
+<button onclick="uploadVideo()">Upload Video</button>
+
+</div>
+
+<input type="text" id="videoSearch" placeholder="Search video..." onkeyup="searchVideo()">
+
+<div id="videoList"></div>
+
+</section>
+
+
+<!-- PDF -->
+<section id="pdf">
+
+<h3>PDF Section</h3>
+
+<div class="admin">
+
+<input type="password" id="pdfPass" placeholder="Admin password">
+
+<input type="file" id="pdfFile" multiple>
+
+<button onclick="uploadPDF()">Upload PDF</button>
+
+</div>
+
+<input type="text" id="pdfSearch" placeholder="Search PDF..." onkeyup="searchPDF()">
+
+<div id="pdfList"></div>
+
+</section>
+
+
+<!-- LIVE -->
+<section id="live">
+
+<h3>Live Video</h3>
+
+<input type="text" id="liveVideoURL" placeholder="Paste YouTube URL">
+
+<button onclick="showLiveVideo()">Play</button>
+
+<div id="liveVideoContainer"></div>
+
+</section>
+
+<script>
+
+let adminPassword="1234"
+
+let videos=JSON.parse(localStorage.getItem("videos")||"[]")
+let pdfs=JSON.parse(localStorage.getItem("pdfs")||"[]")
+
+function openPage(id){
+
+document.querySelectorAll("section").forEach(s=>s.style.display="none")
+
+document.getElementById(id).style.display="block"
+
+}
+
+function uploadVideo(){
+
+let pass=document.getElementById("videoPass").value
+
+if(pass!==adminPassword){
+
+alert("Wrong password")
+
+return
+
+}
+
+let files=document.getElementById("videoFile").files
+
+for(let f of files){
+
+let url=URL.createObjectURL(f)
+
+videos.push({
+name:f.name,
+url:url
+})
+
+}
+
+localStorage.setItem("videos",JSON.stringify(videos))
+
+loadVideos()
+
+}
+
+function deleteVideo(i){
+
+let pass=prompt("Enter admin password to delete")
+
+if(pass!==adminPassword){
+
+alert("Wrong password")
+
+return
+
+}
+
+videos.splice(i,1)
+
+localStorage.setItem("videos",JSON.stringify(videos))
+
+loadVideos()
+
+}
+
+function loadVideos(){
+
+let html=""
+
+videos.forEach((v,i)=>{
+
+html+=`
+
+<div class="card">
+
+<h4>${v.name}</h4>
+
+<video width="100%" controls src="${v.url}"></video>
+
+<button class="deleteBtn" onclick="deleteVideo(${i})">Delete</button>
+
+</div>
+
+`
+
+})
+
+document.getElementById("videoList").innerHTML=html
+
+}
+
+function searchVideo(){
+
+let t=document.getElementById("videoSearch").value.toLowerCase()
+
+let html=""
+
+videos.forEach((v,i)=>{
+
+if(v.name.toLowerCase().includes(t)){
+
+html+=`
+
+<div class="card">
+
+<h4>${v.name}</h4>
+
+<video width="100%" controls src="${v.url}"></video>
+
+<button class="deleteBtn" onclick="deleteVideo(${i})">Delete</button>
+
+</div>
+
+`
+
+}
+
+})
+
+document.getElementById("videoList").innerHTML=html
+
+}
+
+function uploadPDF(){
+
+let pass=document.getElementById("pdfPass").value
+
+if(pass!==adminPassword){
+
+alert("Wrong password")
+
+return
+
+}
+
+let files=document.getElementById("pdfFile").files
+
+for(let f of files){
+
+let url=URL.createObjectURL(f)
+
+pdfs.push({
+name:f.name,
+url:url
+})
+
+}
+
+localStorage.setItem("pdfs",JSON.stringify(pdfs))
+
+loadPDFs()
+
+}
+
+function deletePDF(i){
+
+let pass=prompt("Enter admin password to delete")
+
+if(pass!==adminPassword){
+
+alert("Wrong password")
+
+return
+
+}
+
+pdfs.splice(i,1)
+
+localStorage.setItem("pdfs",JSON.stringify(pdfs))
+
+loadPDFs()
+
+}
+
+function loadPDFs(){
+
+let html=""
+
+pdfs.forEach((p,i)=>{
+
+html+=`
+
+<div class="card">
+
+<a href="${p.url}" target="_blank">${p.name}</a>
+
+<button class="deleteBtn" onclick="deletePDF(${i})">Delete</button>
+
+</div>
+
+`
+
+})
+
+document.getElementById("pdfList").innerHTML=html
+
+}
+
+function searchPDF(){
+
+let t=document.getElementById("pdfSearch").value.toLowerCase()
+
+let html=""
+
+pdfs.forEach((p,i)=>{
+
+if(p.name.toLowerCase().includes(t)){
+
+html+=`
+
+<div class="card">
+
+<a href="${p.url}" target="_blank">${p.name}</a>
+
+<button class="deleteBtn" onclick="deletePDF(${i})">Delete</button>
+
+</div>
+
+`
+
+}
+
+})
+
+document.getElementById("pdfList").innerHTML=html
+
+}
+
+function showLiveVideo(){
+
+let url=document.getElementById("liveVideoURL").value
+
+let id=""
+
+if(url.includes("watch?v=")){
+
+id=url.split("watch?v=")[1]
+
+}
+
+if(url.includes("youtu.be/")){
+
+id=url.split("youtu.be/")[1]
+
+}
+
+let iframe=`
+
+<iframe width="100%" height="300"
+
+src="https://www.youtube.com/embed/${id}"
+
+frameborder="0"
+
+allowfullscreen>
+
+</iframe>
+
+`
+
+document.getElementById("liveVideoContainer").innerHTML=iframe
+
+}
+
+loadVideos()
+loadPDFs()
+openPage("video")
+
+</script>
+
+</body>
+</html>

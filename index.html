@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|welcome</title>
+
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1225683645072266"
+crossorigin="anonymous"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#198754,#005601,#0d983a);
+color:white;
+}
+
+/* Splash */
+#splash{
+position:fixed;
+width:100%;
+height:100%;
+background:#198754;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+
+/* Dashboard */
+.container{
+text-align:center;
+max-width:400px;
+margin:auto;
+padding-top:60px;
+}
+
+.btn{
+display:block;
+padding:15px;
+margin:12px;
+background:white;
+color:#2c5364;
+text-decoration:none;
+font-weight:bold;
+border-radius:10px;
+}
+
+/* Popup Ad */
+#popupAd{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:99999;
+}
+
+.adContent{
+background:white;
+padding:20px;
+border-radius:10px;
+text-align:center;
+color:black;
+width:90%;
+max-width:320px;
+}
+
+.closeBtn{
+margin-top:10px;
+padding:10px;
+background:#198754;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Splash -->
+<div id="splash">
+<h2>Welcome To Shuaibu Platform</h2>
+<p>Loading...</p>
+</div>
+
+<!-- Popup Ad -->
+<div id="popupAd">
+<div class="adContent">
+
+<h3>Advertisement</h3>
+
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-1225683645072266"
+data-ad-slot="1234567890"
+data-ad-format="auto"></ins>
+
+<br>
+
+<button class="closeBtn" onclick="closeAd()">Continue</button>
+
+</div>
+</div>
+
+<!-- Dashboard -->
+<div class="container">
+
+<h2>Main Menu</h2>
+
+<a href="#" class="btn" onclick="openLink('audio.html')">🔊 Qira atul Qur'an</a>
+
+<a href="#" class="btn" onclick="openLink('video.html')">📡 Live/ 📺 Videos / 📄 PDF</a>
+
+<a href="#" class="btn" onclick="openLink('arabic.html')">📘 Arabic Dictionary</a>
+
+<a href="#" class="btn" onclick="openLink('english.html')">📘 English Dictionary</a>
+
+<a href="#" class="btn" onclick="openLink('speak.html')">🗣️ Arabic & English Speak</a>
+
+<a href="#" class="btn" onclick="openLink('school.html')">🏫 School App</a>
+
+<a href="#" class="btn" onclick="openLink('attendance.html')">📝 Attendance</a>
+<a href="#" class="btn" onclick="openLink('expensive.html')">Expensive Tracker</a>
+<a href="#" class="btn" onclick="openLink('contact.html')">contact us</a>
+
+</div>
+
+<script>
+
+/* Splash */
+setTimeout(function(){
+document.getElementById("splash").style.display="none";
+},3000);
+
+/* Popup Ad */
+let nextLink="";
+
+function openLink(link){
+nextLink=link;
+document.getElementById("popupAd").style.display="flex";
+}
+
+function closeAd(){
+document.getElementById("popupAd").style.display="none";
+window.location.href=nextLink;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuaibu Platform|Attendance</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#198754;
+color:white;
+padding:15px;
+text-align:center;
+}
+
+.container{
+padding:15px;
+}
+
+input,button{
+padding:8px;
+margin:5px;
+}
+
+button{
+background:#198754;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.card{
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:6px;
+}
+
+.hidden{
+display:none;
+}
+
+.tabs button{
+background:#198754;
+color:white;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>Attendance Management System</h2>
+</header>
+
+<div class="container">
+
+<!-- AUTH -->
+<div id="auth">
+
+<h3>Register</h3>
+<input type="text" id="regUser" placeholder="Username">
+<input type="password" id="regPass" placeholder="Password">
+<button onclick="register()">Register</button>
+
+<h3>Login</h3>
+<input type="text" id="logUser" placeholder="Username">
+<input type="password" id="logPass" placeholder="Password">
+<button onclick="login()">Login</button>
+
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+<div class="tabs">
+<button onclick="showTab('teachers')">Teachers</button>
+<button onclick="showTab('students')">Students</button>
+</div>
+
+<!-- TEACHERS -->
+<div id="teachers">
+
+<h3>Teacher Attendance</h3>
+
+<input type="text" id="tWeek" placeholder="Week">
+<input type="text" id="tName" placeholder="Teacher name">
+<input type="text" id="tClass" placeholder="Class">
+<input type="date" id="tDate">
+<input type="time" id="tTime">
+
+<button onclick="addTeacher()">Add</button>
+
+<div id="teacherList"></div>
+
+</div>
+
+<!-- STUDENTS -->
+<div id="students" class="hidden">
+
+<h3>Student Attendance</h3>
+
+<input type="text" id="sName" placeholder="Student name">
+<input type="date" id="sDate">
+<input type="time" id="sTime">
+
+<button onclick="addStudent()">Add</button>
+
+<div id="studentList"></div>
+
+</div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+</div>
+
+<script>
+
+// STORAGE
+let users = JSON.parse(localStorage.getItem("attUsers") || "[]");
+let teachers = JSON.parse(localStorage.getItem("teachers") || "[]");
+let students = JSON.parse(localStorage.getItem("attStudents") || "[]");
+
+
+// REGISTER
+function register(){
+
+let u=document.getElementById("regUser").value;
+let p=document.getElementById("regPass").value;
+
+if(!u || !p){
+alert("Fill all fields");
+return;
+}
+
+users.push({user:u,pass:p});
+
+localStorage.setItem("attUsers",JSON.stringify(users));
+
+alert("Account created");
+
+}
+
+
+// LOGIN
+function login(){
+
+let u=document.getElementById("logUser").value;
+let p=document.getElementById("logPass").value;
+
+let found=users.find(x=>x.user==u && x.pass==p);
+
+if(found){
+
+document.getElementById("auth").style.display="none";
+document.getElementById("dashboard").classList.remove("hidden");
+
+loadTeachers();
+loadStudents();
+
+}else{
+
+alert("Wrong login");
+
+}
+
+}
+
+
+// LOGOUT
+function logout(){
+location.reload();
+}
+
+
+// TABS
+function showTab(tab){
+
+document.getElementById("teachers").classList.add("hidden");
+document.getElementById("students").classList.add("hidden");
+
+document.getElementById(tab).classList.remove("hidden");
+
+}
+
+
+// ADD TEACHER
+function addTeacher(){
+
+let t={
+id:Date.now(),
+week:tWeek.value,
+name:tName.value,
+class:tClass.value,
+date:tDate.value,
+time:tTime.value
+};
+
+teachers.push(t);
+
+localStorage.setItem("teachers",JSON.stringify(teachers));
+
+loadTeachers();
+
+tWeek.value="";
+tName.value="";
+tClass.value="";
+}
+
+
+// LOAD TEACHERS
+function loadTeachers(){
+
+let html="";
+
+teachers.forEach(t=>{
+
+html+=`
+<div class="card">
+
+<b>${t.name}</b><br>
+
+Week: ${t.week}<br>
+Class: ${t.class}<br>
+Date: ${t.date}<br>
+Time: ${t.time}<br>
+
+<button onclick="editTeacher(${t.id})">Edit</button>
+
+<button onclick="deleteTeacher(${t.id})">Delete</button>
+
+</div>
+`;
+
+});
+
+document.getElementById("teacherList").innerHTML=html;
+
+}
+
+
+// DELETE TEACHER
+function deleteTeacher(id){
+
+teachers=teachers.filter(t=>t.id!=id);
+
+localStorage.setItem("teachers",JSON.stringify(teachers));
+
+loadTeachers();
+
+}
+
+
+// EDIT TEACHER
+function editTeacher(id){
+
+let t=teachers.find(x=>x.id==id);
+
+let name=prompt("Name",t.name);
+let week=prompt("Week",t.week);
+
+t.name=name;
+t.week=week;
+
+localStorage.setItem("teachers",JSON.stringify(teachers));
+
+loadTeachers();
+
+}
+
+
+// ADD STUDENT
+function addStudent(){
+
+let s={
+id:Date.now(),
+name:sName.value,
+date:sDate.value,
+time:sTime.value
+};
+
+students.push(s);
+
+localStorage.setItem("attStudents",JSON.stringify(students));
+
+loadStudents();
+
+sName.value="";
+}
+
+
+// LOAD STUDENTS
+function loadStudents(){
+
+let html="";
+
+students.forEach(s=>{
+
+html+=`
+<div class="card">
+
+<b>${s.name}</b><br>
+
+Date: ${s.date}<br>
+Time: ${s.time}<br>
+
+<button onclick="editStudent(${s.id})">Edit</button>
+
+<button onclick="deleteStudent(${s.id})">Delete</button>
+
+</div>
+`;
+
+});
+
+document.getElementById("studentList").innerHTML=html;
+
+}
+
+
+// DELETE STUDENT
+function deleteStudent(id){
+
+students=students.filter(s=>s.id!=id);
+
+localStorage.setItem("attStudents",JSON.stringify(students));
+
+loadStudents();
+
+}
+
+
+// EDIT STUDENT
+function editStudent(id){
+
+let s=students.find(x=>x.id==id);
+
+let name=prompt("Name",s.name);
+
+s.name=name;
+
+localStorage.setItem("attStudents",JSON.stringify(students));
+
+loadStudents();
+
+}
+</script>
+
+</body>
+</html>
